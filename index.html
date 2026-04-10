@@ -99,6 +99,38 @@
         </div>
       </article>
 
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Network Test</h2>
+          <span id="networkTestStatus" class="hint">Not run yet</span>
+        </div>
+        <form id="networkTestForm" class="task-form">
+          <label>
+            <span>Test URL</span>
+            <input
+              id="networkTestUrl"
+              name="networkTestUrl"
+              type="url"
+              value="https://jsonplaceholder.typicode.com/todos/1"
+              placeholder="https://example.com/api/test"
+              required
+            >
+          </label>
+          <button type="submit" class="primary">Run Network Test</button>
+        </form>
+        <ul class="summary-list network-summary">
+          <li>
+            <span>HTTP status</span>
+            <strong id="networkTestCode">-</strong>
+          </li>
+          <li>
+            <span>Duration</span>
+            <strong id="networkTestDuration">-</strong>
+          </li>
+        </ul>
+        <pre id="networkTestBody" class="network-body">No response yet.</pre>
+      </article>
+
       <article class="panel panel-wide">
         <div class="panel-head">
           <h2>Activity Timeline</h2>

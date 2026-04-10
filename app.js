@@ -15,6 +15,12 @@ const feedStatus = document.getElementById("feedStatus");
 const feedMessage = document.getElementById("feedMessage");
 const feedUpdatedAt = document.getElementById("feedUpdatedAt");
 const feedItems = document.getElementById("feedItems");
+const networkTestForm = document.getElementById("networkTestForm");
+const networkTestUrl = document.getElementById("networkTestUrl");
+const networkTestStatus = document.getElementById("networkTestStatus");
+const networkTestCode = document.getElementById("networkTestCode");
+const networkTestDuration = document.getElementById("networkTestDuration");
+const networkTestBody = document.getElementById("networkTestBody");
 const timeline = document.getElementById("timeline");
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
@@ -212,6 +218,36 @@ function render() {
   renderTimeline();
 }
 
+async function runNetworkTest(url) {
+  networkTestStatus.textContent = "Running...";
+  networkTestCode.textContent = "-";
+  networkTestDuration.textContent = "-";
+  networkTestBody.textContent = "Waiting for response...";
+
+  const startedAt = performance.now();
+
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      cache: "no-store",
+    });
+    const durationMs = Math.round(performance.now() - startedAt);
+    const bodyText = await response.text();
+
+    networkTestStatus.textContent = response.ok ? "Request succeeded" : "Request failed";
+    networkTestCode.textContent = String(response.status);
+    networkTestDuration.textContent = `${durationMs} ms`;
+    networkTestBody.textContent = bodyText || "Response body was empty.";
+  } catch (error) {
+    const durationMs = Math.round(performance.now() - startedAt);
+
+    networkTestStatus.textContent = "Network error";
+    networkTestCode.textContent = "blocked";
+    networkTestDuration.textContent = `${durationMs} ms`;
+    networkTestBody.textContent = error instanceof Error ? error.message : "Unknown error";
+  }
+}
+
 function maybeSendReminder() {
   if (!state.sessionStart) {
     return;
@@ -304,6 +340,17 @@ clearLogButton.addEventListener("click", () => {
 
 refreshFeedButton.addEventListener("click", () => {
   refreshFeed();
+});
+
+networkTestForm.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const url = networkTestUrl.value.trim();
+
+  if (!url) {
+    return;
+  }
+
+  runNetworkTest(url);
 });
 
 render();
