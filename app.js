@@ -1,5 +1,7 @@
 const STORAGE_KEY = "work-session-tracker";
 const REMINDER_MINUTES = 20;
+const FEED_POLL_INTERVAL_MS = 60 * 1000;
+const FEED_URL = "./mock-status.json";
 
 const state = loadState();
 
@@ -9,6 +11,9 @@ const sessionState = document.getElementById("sessionState");
 const entryCount = document.getElementById("entryCount");
 const latestTask = document.getElementById("latestTask");
 const nextReminder = document.getElementById("nextReminder");
+const feedStatus = document.getElementById("feedStatus");
+const feedMessage = document.getElementById("feedMessage");
+const feedUpdatedAt = document.getElementById("feedUpdatedAt");
 const timeline = document.getElementById("timeline");
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
@@ -16,6 +21,7 @@ const noteInput = document.getElementById("noteInput");
 const startSessionButton = document.getElementById("startSession");
 const endSessionButton = document.getElementById("endSession");
 const clearLogButton = document.getElementById("clearLog");
+const refreshFeedButton = document.getElementById("refreshFeed");
 const timelineItemTemplate = document.getElementById("timelineItemTemplate");
 
 function loadState() {
@@ -23,6 +29,12 @@ function loadState() {
     sessionStart: null,
     entries: [],
     lastReminderAt: null,
+    feed: {
+      message: "No data loaded yet",
+      lastUpdatedAt: null,
+      lastPolledAt: null,
+      error: null,
+    },
   };
 
   try {
@@ -117,9 +129,29 @@ function renderSession() {
   clock.textContent = formatTime(new Date(now));
 }
 
+function renderFeed() {
+  feedMessage.textContent = state.feed.message;
+  feedUpdatedAt.textContent = state.feed.lastUpdatedAt
+    ? formatTimestamp(state.feed.lastUpdatedAt)
+    : "Never";
+
+  if (state.feed.error) {
+    feedStatus.textContent = "Refresh failed";
+    return;
+  }
+
+  if (state.feed.lastPolledAt) {
+    feedStatus.textContent = `Refreshed ${formatTime(new Date(state.feed.lastPolledAt))}`;
+    return;
+  }
+
+  feedStatus.textContent = "Waiting for refresh";
+}
+
 function render() {
   renderSession();
   renderSummary();
+  renderFeed();
   renderTimeline();
 }
 
@@ -139,6 +171,33 @@ function maybeSendReminder() {
   state.lastReminderAt = now;
   saveState();
   addEntry("Status reminder", "Time to update your task note, team status, or ticket progress.");
+}
+
+async function refreshFeed() {
+  try {
+    const response = await fetch(FEED_URL, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const payload = await response.json();
+    state.feed = {
+      message: payload.message || "Feed refreshed",
+      lastUpdatedAt: payload.updatedAt || Date.now(),
+      lastPolledAt: Date.now(),
+      error: null,
+    };
+    saveState();
+    renderFeed();
+  } catch (error) {
+    state.feed = {
+      ...state.feed,
+      lastPolledAt: Date.now(),
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+    saveState();
+    renderFeed();
+  }
 }
 
 taskForm.addEventListener("submit", (event) => {
@@ -184,9 +243,17 @@ clearLogButton.addEventListener("click", () => {
   render();
 });
 
+refreshFeedButton.addEventListener("click", () => {
+  refreshFeed();
+});
+
 render();
 setInterval(() => {
   renderSession();
   maybeSendReminder();
   renderSummary();
 }, 1000);
+refreshFeed();
+setInterval(() => {
+  refreshFeed();
+}, FEED_POLL_INTERVAL_MS);
