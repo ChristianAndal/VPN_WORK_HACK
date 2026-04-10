@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Session Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <p class="eyebrow">Local productivity dashboard</p>
+      <h1>Track what you are actually doing.</h1>
+      <p class="lede">
+        Keep a simple running log of your work session, recent tasks, and reminder pings for legitimate status updates.
+      </p>
+    </section>
+
+    <section class="grid">
+      <article class="panel panel-accent">
+        <div class="panel-head">
+          <h2>Current Session</h2>
+          <span id="sessionState" class="badge">Idle</span>
+        </div>
+        <div class="metrics">
+          <div>
+            <p class="metric-label">Local time</p>
+            <p id="clock" class="metric-value">--:--:--</p>
+          </div>
+          <div>
+            <p class="metric-label">Session elapsed</p>
+            <p id="elapsed" class="metric-value">00:00:00</p>
+          </div>
+        </div>
+        <div class="actions">
+          <button id="startSession" class="primary">Start Session</button>
+          <button id="endSession" class="ghost">End Session</button>
+        </div>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Quick Notes</h2>
+          <span class="hint">Saved in your browser</span>
+        </div>
+        <form id="taskForm" class="task-form">
+          <label>
+            <span>What are you working on?</span>
+            <input id="taskInput" name="task" type="text" maxlength="140" placeholder="Example: Finish API error handling for inventory sync" required>
+          </label>
+          <label>
+            <span>Optional note</span>
+            <textarea id="noteInput" name="note" rows="3" maxlength="240" placeholder="Short context for your future self"></textarea>
+          </label>
+          <button type="submit" class="primary">Add Entry</button>
+        </form>
+      </article>
+
+      <article class="panel">
+        <div class="panel-head">
+          <h2>Daily Summary</h2>
+          <span id="entryCount" class="hint">0 entries</span>
+        </div>
+        <ul class="summary-list">
+          <li>
+            <span>Latest task</span>
+            <strong id="latestTask">Nothing logged yet</strong>
+          </li>
+          <li>
+            <span>Reminder ping</span>
+            <strong id="nextReminder">Every 20 minutes</strong>
+          </li>
+        </ul>
+      </article>
+
+      <article class="panel panel-wide">
+        <div class="panel-head">
+          <h2>Activity Timeline</h2>
+          <button id="clearLog" class="ghost">Clear Log</button>
+        </div>
+        <ul id="timeline" class="timeline">
+          <li class="empty">No activity yet. Start a session and add your first task.</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <template id="timelineItemTemplate">
+    <li class="timeline-item">
+      <div class="timeline-dot"></div>
+      <div class="timeline-copy">
+        <div class="timeline-row">
+          <strong class="timeline-title"></strong>
+          <span class="timeline-time"></span>
+        </div>
+        <p class="timeline-note"></p>
+      </div>
+    </li>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
