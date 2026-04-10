@@ -1,4 +1,18 @@
 {
-  "message": "Dashboard feed is healthy. Update this file to simulate new internal status content.",
-  "updatedAt": "2026-04-10T12:00:00+08:00"
+  "message": "Dashboard feed is healthy. Recent status items loaded.",
+  "updatedAt": "2026-04-10T12:00:00+08:00",
+  "items": [
+    {
+      "title": "Inventory sync",
+      "detail": "Warehouse API sync completed without errors."
+    },
+    {
+      "title": "VPN access",
+      "detail": "Remote access gateway latency is back within normal range."
+    },
+    {
+      "title": "Deployment queue",
+      "detail": "Two pending changes are waiting for review before release."
+    }
+  ]
 }

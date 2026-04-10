@@ -14,6 +14,7 @@ const nextReminder = document.getElementById("nextReminder");
 const feedStatus = document.getElementById("feedStatus");
 const feedMessage = document.getElementById("feedMessage");
 const feedUpdatedAt = document.getElementById("feedUpdatedAt");
+const feedItems = document.getElementById("feedItems");
 const timeline = document.getElementById("timeline");
 const taskForm = document.getElementById("taskForm");
 const taskInput = document.getElementById("taskInput");
@@ -31,6 +32,7 @@ function loadState() {
     lastReminderAt: null,
     feed: {
       message: "No data loaded yet",
+      items: [],
       lastUpdatedAt: null,
       lastPolledAt: null,
       error: null,
@@ -39,7 +41,19 @@ function loadState() {
 
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? { ...fallback, ...JSON.parse(raw) } : fallback;
+    if (!raw) {
+      return fallback;
+    }
+
+    const parsed = JSON.parse(raw);
+    return {
+      ...fallback,
+      ...parsed,
+      feed: {
+        ...fallback.feed,
+        ...parsed.feed,
+      },
+    };
   } catch {
     return fallback;
   }
@@ -134,6 +148,7 @@ function renderFeed() {
   feedUpdatedAt.textContent = state.feed.lastUpdatedAt
     ? formatTimestamp(state.feed.lastUpdatedAt)
     : "Never";
+  renderFeedItems();
 
   if (state.feed.error) {
     feedStatus.textContent = "Refresh failed";
@@ -146,6 +161,48 @@ function renderFeed() {
   }
 
   feedStatus.textContent = "Waiting for refresh";
+}
+
+function renderFeedItems() {
+  feedItems.innerHTML = "";
+  const items = Array.isArray(state.feed.items) ? state.feed.items : [];
+
+  if (items.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "empty";
+    empty.textContent = "No feed items yet.";
+    feedItems.appendChild(empty);
+    return;
+  }
+
+  items.forEach((item) => {
+    const row = document.createElement("li");
+    const title = document.createElement("strong");
+    const detail = document.createElement("span");
+
+    title.textContent = item.title;
+    detail.textContent = item.detail;
+
+    row.append(title, detail);
+    feedItems.appendChild(row);
+  });
+}
+
+function normalizeFeedPayload(payload) {
+  const sourceItems = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload.items)
+      ? payload.items
+      : [];
+
+  return {
+    message: payload.message || "Feed refreshed",
+    lastUpdatedAt: payload.updatedAt || Date.now(),
+    items: sourceItems.map((item, index) => ({
+      title: item.title || `Feed item ${index + 1}`,
+      detail: item.detail || item.message || "No additional detail.",
+    })),
+  };
 }
 
 function render() {
@@ -181,9 +238,11 @@ async function refreshFeed() {
     }
 
     const payload = await response.json();
+    const normalized = normalizeFeedPayload(payload);
     state.feed = {
-      message: payload.message || "Feed refreshed",
-      lastUpdatedAt: payload.updatedAt || Date.now(),
+      message: normalized.message,
+      items: normalized.items,
+      lastUpdatedAt: normalized.lastUpdatedAt,
       lastPolledAt: Date.now(),
       error: null,
     };
