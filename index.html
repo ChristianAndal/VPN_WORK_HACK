@@ -11,18 +11,49 @@
 </head>
 <body>
   <main class="shell">
+    <header class="topbar" aria-label="Workspace header">
+      <a class="brand" href="#" aria-label="Work Session Tracker home">
+        <span class="brand-mark">W</span>
+        <span>
+          <strong>Work Session Tracker</strong>
+          <small>Private browser workspace</small>
+        </span>
+      </a>
+      <nav class="topnav" aria-label="Dashboard sections">
+        <a href="#session">Session</a>
+        <a href="#notes">Notes</a>
+        <a href="#activity">Activity</a>
+      </nav>
+    </header>
+
     <section class="hero">
-      <p class="eyebrow">Local productivity dashboard</p>
-      <h1>Track what you are actually doing.</h1>
-      <p class="lede">
-        Keep a simple running log of your work session, recent tasks, and reminder pings for legitimate status updates.
-      </p>
+      <div class="hero-copy">
+        <p class="eyebrow">Local productivity dashboard</p>
+        <h1>Track focused work with a clean daily record.</h1>
+        <p class="lede">
+          Keep a running log of your session, current priorities, refresh checks, and status reminders in one calm workspace.
+        </p>
+        <div class="hero-actions" aria-label="Dashboard highlights">
+          <span>Browser-saved entries</span>
+          <span>20-minute reminders</span>
+          <span>Manual network checks</span>
+        </div>
+      </div>
+      <div class="hero-media" aria-hidden="true">
+        <img
+          src="https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=900&q=80"
+          alt=""
+        >
+      </div>
     </section>
 
     <section class="grid">
-      <article class="panel panel-accent">
+      <article id="session" class="panel panel-accent">
         <div class="panel-head">
-          <h2>Current Session</h2>
+          <div>
+            <p class="panel-kicker">Live timer</p>
+            <h2>Current Session</h2>
+          </div>
           <span id="sessionState" class="badge">Idle</span>
         </div>
         <div class="metrics">
@@ -41,9 +72,12 @@
         </div>
       </article>
 
-      <article class="panel">
+      <article id="notes" class="panel">
         <div class="panel-head">
-          <h2>Quick Notes</h2>
+          <div>
+            <p class="panel-kicker">Capture</p>
+            <h2>Quick Notes</h2>
+          </div>
           <span class="hint">Saved in your browser</span>
         </div>
         <form id="taskForm" class="task-form">
@@ -61,7 +95,10 @@
 
       <article class="panel">
         <div class="panel-head">
-          <h2>Daily Summary</h2>
+          <div>
+            <p class="panel-kicker">Overview</p>
+            <h2>Daily Summary</h2>
+          </div>
           <span id="entryCount" class="hint">0 entries</span>
         </div>
         <ul class="summary-list">
@@ -78,7 +115,10 @@
 
       <article class="panel">
         <div class="panel-head">
-          <h2>Dashboard Feed</h2>
+          <div>
+            <p class="panel-kicker">Status</p>
+            <h2>Dashboard Feed</h2>
+          </div>
           <span id="feedStatus" class="hint">Waiting for refresh</span>
         </div>
         <ul class="summary-list">
@@ -101,7 +141,10 @@
 
       <article class="panel">
         <div class="panel-head">
-          <h2>Network Test</h2>
+          <div>
+            <p class="panel-kicker">Diagnostics</p>
+            <h2>Network Test</h2>
+          </div>
           <span id="networkTestStatus" class="hint">Not run yet</span>
         </div>
         <form id="networkTestForm" class="task-form">
@@ -131,9 +174,12 @@
         <pre id="networkTestBody" class="network-body">No response yet.</pre>
       </article>
 
-      <article class="panel panel-wide">
+      <article id="activity" class="panel panel-wide">
         <div class="panel-head">
-          <h2>Activity Timeline</h2>
+          <div>
+            <p class="panel-kicker">Record</p>
+            <h2>Activity Timeline</h2>
+          </div>
           <button id="clearLog" class="ghost">Clear Log</button>
         </div>
         <ul id="timeline" class="timeline">
